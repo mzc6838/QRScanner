@@ -16,6 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.baidu.ocr.sdk.OCR;
+import com.baidu.ocr.sdk.OnResultListener;
+import com.baidu.ocr.sdk.exception.OCRError;
+import com.baidu.ocr.sdk.model.AccessToken;
+import com.baidu.ocr.sdk.model.GeneralBasicParams;
+import com.baidu.ocr.sdk.model.GeneralResult;
+import com.baidu.ocr.sdk.model.WordSimple;
+import com.google.gson.Gson;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.DecodeHintType;
@@ -27,6 +35,7 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
+import java.io.File;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -35,6 +44,7 @@ public class MainActivity extends Activity {
     Button scan;
     Button copy;
     Button album;
+    Button getWord;
     EditText showText;
     ClipboardManager clipboardManager;
 
@@ -51,8 +61,19 @@ public class MainActivity extends Activity {
         showText = findViewById(R.id.showText);
         copy = findViewById(R.id.copy);
         album = findViewById(R.id.album);
+        getWord = findViewById(R.id.getWord);
         clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         showText.clearFocus();
+
+        OCR.getInstance(this).initAccessToken(new OnResultListener<AccessToken>() {
+            @Override
+            public void onResult(AccessToken accessToken) {
+                String token = accessToken.getAccessToken();
+            }
+
+            @Override
+            public void onError(OCRError ocrError) {}
+        }, getApplicationContext());
 
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,47 +99,96 @@ public class MainActivity extends Activity {
                 startActivityForResult(wrapperIntent, 222);
             }
         });
+        getWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent innerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent wrapperIntent = Intent.createChooser(innerIntent, "选择图片");
+                startActivityForResult(wrapperIntent, 333);
+            }
+        });
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 111){
-            if(data != null) {
+        if (requestCode == 111) {
+            if (data != null) {
                 showText.setText(data.getStringExtra("codedContent"));
                 showText.clearFocus();
-            }else{
+            } else {
                 showText.setText("");
                 showText.clearFocus();
             }
-        }else if(requestCode == 222){
+        } else if (requestCode == 222) {
             String[] address = {MediaStore.Images.Media.DATA};
-            Cursor cursor = this.getContentResolver().query(data.getData(), address, null, null, null);
-            if(cursor.moveToFirst()){
-                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                String photoPath = cursor.getString(columnIndex);
-                Log.d("photoPath: ", photoPath);
-                String result = parseQRcode(photoPath);
-                if(result != null){
-                    showText.setText(result);
-                    showText.clearFocus();
-                }else{
-                    showText.setText("");
-                    showText.clearFocus();
+            if (data == null) {
+                showText.setText("");
+                showText.clearFocus();
+            } else {
+                Cursor cursor = this.getContentResolver().query(data.getData(), address, null, null, null);
+                if (cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    String photoPath = cursor.getString(columnIndex);
+                    //Log.d("photoPath: ", photoPath);
+                    String result = parseQRCode(photoPath);
+                    if (result != null) {
+                        showText.setText(result);
+                        showText.clearFocus();
+                    } else {
+                        showText.setText("");
+                        showText.clearFocus();
+                    }
+                }
+            }
+        } else if (requestCode == 333) {
+            String[] address = {MediaStore.Images.Media.DATA};
+            if (data == null) {
+                showText.setText("");
+                showText.clearFocus();
+            } else {
+                Cursor cursor = this.getContentResolver().query(data.getData(), address, null, null, null);
+                if (cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    final String photoPath = cursor.getString(columnIndex);
+                    Log.d("photoPath: ", photoPath);
+
+                    GeneralBasicParams params = new GeneralBasicParams();
+                    params.setImageFile(new File(photoPath));
+
+                    final StringBuffer sb = new StringBuffer();
+
+                    OCR.getInstance(this).recognizeGeneralBasic(params, new OnResultListener<GeneralResult>() {
+                        @Override
+                        public void onResult(GeneralResult generalResult) {
+                            for (WordSimple wordSimple : generalResult.getWordList()) {
+                                sb.append(wordSimple.getWords());
+                                sb.append("\n");
+                            }
+                            //Log.i("StringBuffer", sb.toString());
+                            showText.setText(sb.toString());
+                        }
+
+                        @Override
+                        public void onError(OCRError ocrError) {
+
+                        }
+                    });
+
                 }
             }
         }
     }
 
-    public  String parseQRcode(String bitmapPath){
+    public  String parseQRCode(String bitmapPath){
         Bitmap bitmap = BitmapFactory.decodeFile(bitmapPath, null);
-        String result=parseQRcode(bitmap);
+        String result=parseQRCode(bitmap);
         return result;
     }
 
-    public  String parseQRcode(Bitmap bmp){
+    public  String parseQRCode(Bitmap bmp){
         //bmp=comp(bmp);//bitmap压缩  如果不压缩的话在低配置的手机上解码很慢
 
         int width = bmp.getWidth();
