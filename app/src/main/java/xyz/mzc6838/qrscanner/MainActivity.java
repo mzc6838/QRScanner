@@ -39,12 +39,13 @@ import java.io.File;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     Button scan;
     Button copy;
     Button album;
     Button getWord;
+    Button fightImg;
     EditText showText;
     ClipboardManager clipboardManager;
 
@@ -62,6 +63,7 @@ public class MainActivity extends Activity {
         copy = findViewById(R.id.copy);
         album = findViewById(R.id.album);
         getWord = findViewById(R.id.getWord);
+        fightImg = findViewById(R.id.fightImgButton);
         clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         showText.clearFocus();
 
@@ -105,6 +107,13 @@ public class MainActivity extends Activity {
                 Intent innerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 Intent wrapperIntent = Intent.createChooser(innerIntent, "选择图片");
                 startActivityForResult(wrapperIntent, 333);
+            }
+        });
+        fightImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FightImgActivity.class);
+                startActivity(intent);
             }
         });
 

@@ -9,6 +9,15 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        compileOptions {
+
+            sourceCompatibility JavaVersion.VERSION_1_8
+
+            targetCompatibility JavaVersion.VERSION_1_8
+
+        }
+
     }
     buildTypes {
         release {
@@ -28,4 +37,7 @@ dependencies {
     implementation files('libs/JavaRoot.jar')
     implementation files('libs/ocr-sdk.jar')
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation("com.squareup.okhttp3:okhttp:3.14.1")
+    compile 'com.android.support:recyclerview-v7:27.0.2'
+
 }
