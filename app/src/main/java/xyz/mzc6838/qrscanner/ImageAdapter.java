@@ -20,6 +20,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public List<ImgInfo> ImgInfoList;
 
     private OnItemLongClickListener onItemLongClickListener;
+    private OnItemClickListener onItemClickListener;
 
     public ImageAdapter(Context context, List<ImgInfo> _ImgInfoList){
         ImgInfoList = _ImgInfoList;
@@ -57,6 +58,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             });
         }
 
+        if(onItemClickListener != null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = holder.getLayoutPosition();
+                    onItemClickListener.onItemClick(holder.itemView, position);
+                }
+            });
+        }
+
     }
 
     @Override
@@ -72,11 +83,19 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     public interface OnItemLongClickListener{
-        boolean onItemLongClick(View view, int Position);
+        boolean onItemLongClick(View view, int position);
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener){
         this.onItemLongClickListener = onItemLongClickListener;
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View view, int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
     }
 
 }

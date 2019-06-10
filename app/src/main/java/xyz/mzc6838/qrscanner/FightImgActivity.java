@@ -1,7 +1,10 @@
 package xyz.mzc6838.qrscanner;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -54,6 +57,12 @@ public class FightImgActivity extends AppCompatActivity {
     }
 
     private void init(){
+
+        /*处理分享时错误（未知错误）*/
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        builder.detectFileUriExposure();
+
         search = findViewById(R.id.searchButton);
         editText = findViewById(R.id.inputKeyWordEditText);
         okHttpClient = new OkHttpClient();
@@ -68,8 +77,8 @@ public class FightImgActivity extends AppCompatActivity {
 
         imageAdapter.setOnItemLongClickListener(new ImageAdapter.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(View view, int Position) {
-                String url = imageInfoList.get(Position).getImage_url();
+            public boolean onItemLongClick(View view, int position) {
+                String url = imageInfoList.get(position).getImage_url();
 
                 Request request = new Request.Builder()
                         .url(url)
@@ -91,20 +100,19 @@ public class FightImgActivity extends AppCompatActivity {
                         FileOutputStream fos = null;
                         String savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "YYDoutu";
                         File file = new File(savePath);
+                        File file1 = new File(savePath, getNameFromUrl(url));
                         if(!file.exists()){
                             file.mkdirs();
                         }
 
                         try{
                             is = response.body().byteStream();
-                            File file1 = new File(savePath, getNameFromUrl(url));
                             fos = new FileOutputStream(file1);
                             while ((len = is.read(buff)) != -1){
                                 fos.write(buff, 0, len);
                             }
                             fos.flush();
                         }catch (Exception e){
-
                         }finally {
                             try{
                                 if(is != null){
@@ -120,6 +128,12 @@ public class FightImgActivity extends AppCompatActivity {
 
                             }
                         }
+
+                        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        Uri uri = Uri.fromFile(file1);
+                        intent.setData(uri);
+                        FightImgActivity.this.sendBroadcast(intent);
+
                         Looper.prepare();
                         Toast.makeText(FightImgActivity.this, "已保存", Toast.LENGTH_SHORT).show();
                         Looper.loop();
@@ -130,6 +144,76 @@ public class FightImgActivity extends AppCompatActivity {
                     }
                 });
                 return true;
+            }
+        });
+        imageAdapter.setOnItemClickListener(new ImageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                String url = imageInfoList.get(position).getImage_url();
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+
+                Call call = okHttpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        return;
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+
+                        InputStream is = null;
+                        byte buff[] = new byte[2048];
+                        int len = 0;
+                        FileOutputStream fos = null;
+                        String savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "YYDoutu";
+                        File file = new File(savePath);
+                        File file1 = new File(savePath, getNameFromUrl(url));
+                        if(!file.exists()){
+                            file.mkdirs();
+                        }
+
+                        try{
+                            is = response.body().byteStream();
+                            fos = new FileOutputStream(file1);
+                            while ((len = is.read(buff)) != -1){
+                                fos.write(buff, 0, len);
+                            }
+                            fos.flush();
+                        }catch (Exception e){
+                        }finally {
+                            try{
+                                if(is != null){
+                                    is.close();
+                                }
+                            }catch (Exception e){
+
+                            }
+                            try{
+                                if(fos != null)
+                                    fos.close();
+                            }catch (Exception e){
+
+                            }
+                        }
+
+                        Uri uri = Uri.fromFile(file1);
+                        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        Intent share_intent = new Intent(Intent.ACTION_SEND);
+                        share_intent.putExtra(Intent.EXTRA_STREAM, uri);
+                        share_intent.setType("image/*");
+                        intent.setData(uri);
+                        FightImgActivity.this.sendBroadcast(intent);
+                        startActivity(Intent.createChooser(share_intent, "分享到"));
+                    }
+
+                    public String getNameFromUrl(String url){
+                        return url.substring(url.lastIndexOf("/") + 1);
+                    }
+                });
             }
         });
 

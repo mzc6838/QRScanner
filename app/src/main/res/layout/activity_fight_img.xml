@@ -38,9 +38,9 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="25dp"
-        android:text="长按保存图片"
+        android:text="点击分享图片,长按保存图片"
         android:gravity="center"
-        android:textSize="20sp"/>
+        android:textSize="18sp"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
