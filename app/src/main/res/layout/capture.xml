@@ -14,8 +14,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
   <SurfaceView android:id="@+id/preview_view"
                android:layout_width="fill_parent"
@@ -53,4 +55,17 @@
       android:id="@+id/viewfinder_view"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
-</merge>
+
+    <Button
+        android:id="@+id/album"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:text="从相册选取"
+        android:textSize="18sp"
+        android:textColor="@color/status_text"
+        android:background="#00000000"/>
+</RelativeLayout>

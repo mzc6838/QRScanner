@@ -17,13 +17,21 @@
 package com.google.zxing.client.android;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.ChecksumException;
 import com.google.zxing.DecodeHintType;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
 import com.google.zxing.ResultMetadataType;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.QRCodeReader;
+
 import xyz.mzc6838.qrscanner.R;
 
 import android.app.Activity;
@@ -32,7 +40,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -40,6 +50,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -51,10 +62,13 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -71,27 +85,16 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final String TAG = CaptureActivity.class.getSimpleName();
 
   private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
-  private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
 
   private static final String[] ZXING_URLS = { "http://zxing.appspot.com/scan", "zxing://scan/" };
-
-  private static final int HISTORY_REQUEST_CODE = 0x0000bacc;
-
-  private static final Collection<ResultMetadataType> DISPLAYABLE_METADATA_TYPES =
-      EnumSet.of(ResultMetadataType.ISSUE_NUMBER,
-                 ResultMetadataType.SUGGESTED_PRICE,
-                 ResultMetadataType.ERROR_CORRECTION_LEVEL,
-                 ResultMetadataType.POSSIBLE_COUNTRY);
 
   private CameraManager cameraManager;
   private CaptureActivityHandler handler;
   private Result savedResultToShow;
   private ViewfinderView viewfinderView;
   private TextView statusView;
-  private View resultView;
   private Result lastResult;
   private boolean hasSurface;
-  private boolean copyToClipboard;
   private IntentSource source;
   private String sourceUrl;
   private ScanFromWebPageManager scanFromWebPageManager;
@@ -101,6 +104,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
   private AmbientLightManager ambientLightManager;
+
+  private Button album;
 
   ViewfinderView getViewfinderView() {
     return viewfinderView;
@@ -128,6 +133,21 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     ambientLightManager = new AmbientLightManager(this);
 
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+    init();
+  }
+
+  private void init(){
+      album = findViewById(R.id.album);
+
+      album.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+              Intent innerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+              Intent wrapperIntent = Intent.createChooser(innerIntent, "选择二维码图片");
+              startActivityForResult(wrapperIntent, 222);
+          }
+      });
   }
 
   @Override
@@ -135,9 +155,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     super.onResume();
     cameraManager = new CameraManager(getApplication());
 
-    viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+    viewfinderView = findViewById(R.id.viewfinder_view);
     viewfinderView.setCameraManager(cameraManager);
-    statusView = (TextView) findViewById(R.id.status_view);
+    statusView =  findViewById(R.id.status_view);
 
     handler = null;
     lastResult = null;
@@ -156,9 +176,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     inactivityTimer.onResume();
 
     Intent intent = getIntent();
-
-    copyToClipboard = prefs.getBoolean(PreferencesActivity.KEY_COPY_TO_CLIPBOARD, true)
-        && (intent == null || intent.getBooleanExtra(Intents.Scan.SAVE_HISTORY, true));
 
     source = IntentSource.NONE;
     sourceUrl = null;
@@ -225,7 +242,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     }
 
-    SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+    SurfaceView surfaceView = findViewById(R.id.preview_view);
     SurfaceHolder surfaceHolder = surfaceView.getHolder();
     if (hasSurface) {
       // The activity was paused but not stopped, so the surface still exists. Therefore
@@ -280,9 +297,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     ambientLightManager.stop();
     beepManager.close();
     cameraManager.closeDriver();
-    //historyManager = null; // Keep for onActivityResult
     if (!hasSurface) {
-      SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+      SurfaceView surfaceView = findViewById(R.id.preview_view);
       SurfaceHolder surfaceHolder = surfaceView.getHolder();
       surfaceHolder.removeCallback(this);
     }
@@ -329,7 +345,29 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 //  }
 
   @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+      super.onActivityResult(requestCode, resultCode, data);
+
+      if(requestCode == 222){
+          String[] address = {MediaStore.Images.Media.DATA};
+          if (data == null) {
+
+          } else {
+              Cursor cursor = this.getContentResolver().query(data.getData(), address, null, null, null);
+              if (cursor.moveToFirst()) {
+                  int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                  String photoPath = cursor.getString(columnIndex);
+                  String result = parseQRCode(photoPath);
+                  Intent captureResult = new Intent();
+                  captureResult.putExtra("scan_result", result);
+
+                  Log.d(TAG, "onActivityResult: " + result);
+
+                  this.setResult(213, captureResult);
+                  this.finish();
+              }
+          }
+      }
   }
 
   private void decodeOrStoreSavedBitmap(Bitmap bitmap, Result result) {
@@ -562,4 +600,37 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public void drawViewfinder() {
     viewfinderView.drawViewfinder();
   }
+
+    public  String parseQRCode(String bitmapPath){
+        Bitmap bitmap = BitmapFactory.decodeFile(bitmapPath, null);
+        String result=parseQRCode(bitmap);
+        return result;
+    }
+
+    public  String parseQRCode(Bitmap bmp){
+        //bmp=comp(bmp);//bitmap压缩  如果不压缩的话在低配置的手机上解码很慢
+
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+        int[] pixels = new int[width * height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        QRCodeReader reader = new QRCodeReader();
+        Map<DecodeHintType, Object> hints = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
+        hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);//优化精度
+        hints.put(DecodeHintType.CHARACTER_SET,"utf-8");//解码设置编码方式为：utf-8
+        try {
+            Result result = reader.decode(new BinaryBitmap(
+                    new HybridBinarizer(new RGBLuminanceSource(width, height, pixels))), hints);
+            return result.getText();
+        } catch (NotFoundException e) {
+            Toast.makeText(this, "未发现二维码", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        } catch (ChecksumException e) {
+            e.printStackTrace();
+        } catch (FormatException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -125,4 +125,8 @@
     <string name="result_wifi">Found WLAN Configuration</string>
     <string name="sbc_name">Google Book Search</string>
     <string name="wifi_changing_network">Requesting connection to network\u2026</string>
+    <string name="scanShortLabel">扫码</string>
+    <string name="scanLongLabel">扫描二维码/条形码</string>
+    <string name="getTextShortLabel">识别文字</string>
+    <string name="getTextLongLabel">识别图中文字</string>
 </resources>

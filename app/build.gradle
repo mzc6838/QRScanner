@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "xyz.mzc6838.qrscanner"
-        minSdkVersion 23
+        minSdkVersion 25
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"

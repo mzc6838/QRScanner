@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <shortcut
+        android:enabled="true"
+        android:shortcutId="scanQR"
+        android:shortcutLongLabel="@string/scanLongLabel"
+        android:shortcutShortLabel="@string/scanShortLabel"
+        android:icon="@drawable/ic_scan">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="xyz.mzc6838.qrscanner.ScanActivity"
+            android:targetPackage="xyz.mzc6838.qrscanner"/>
+
+        <categories android:name="android.shortcut.conversation" />
+
+
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:shortcutId="getText"
+        android:shortcutLongLabel="@string/getTextLongLabel"
+        android:shortcutShortLabel="@string/getTextShortLabel"
+        android:icon="@drawable/ic_gettext">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="xyz.mzc6838.qrscanner.GetTextActivity"
+            android:targetPackage="xyz.mzc6838.qrscanner"/>
+
+        <categories android:name="android.shortcut.conversation" />
+
+
+    </shortcut>
+
+</shortcuts>
