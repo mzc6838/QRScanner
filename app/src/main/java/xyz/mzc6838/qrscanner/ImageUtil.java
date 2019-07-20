@@ -1,9 +1,13 @@
 package xyz.mzc6838.qrscanner;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
+
+import com.google.zxing.common.BitMatrix;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,5 +68,25 @@ public class ImageUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * BitMatrix转Bitmap
+     * @param bitMatrix BitMatrix
+     * @return bitmap Bitmap
+     */
+    public static Bitmap bitmatrixToBitmap(BitMatrix bitMatrix){
+        int height = bitMatrix.getHeight();
+        int width = bitMatrix.getWidth();
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+
+        return bitmap;
     }
 }

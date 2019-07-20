@@ -37,6 +37,8 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".GetTextActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".CreateQRCodeActivity"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

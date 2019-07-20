@@ -129,4 +129,5 @@
     <string name="scanLongLabel">扫描二维码/条形码</string>
     <string name="getTextShortLabel">识别文字</string>
     <string name="getTextLongLabel">识别图中文字</string>
+    <string name="createQRCodeLabel">生成二维码</string>
 </resources>

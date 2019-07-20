@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/editInfo"
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
+        android:layout_margin="5dp"
+        android:hint="在这里输入要转换的文本"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/QRCodeCreate"
+        android:layout_margin="5dp"
+        android:text="生成二维码" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/cleanInput"
+        android:layout_margin="5dp"
+        android:text="清空输入框" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="↓长按保存二维码↓"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:id="@+id/QRCode"/>
+
+</LinearLayout>

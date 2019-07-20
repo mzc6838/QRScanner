@@ -37,4 +37,20 @@
 
     </shortcut>
 
+    <shortcut
+        android:enabled="true"
+        android:shortcutId="createQRCode"
+        android:shortcutLongLabel="@string/createQRCodeLabel"
+        android:shortcutShortLabel="@string/createQRCodeLabel"
+        android:icon="@drawable/ic_qrcode">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="xyz.mzc6838.qrscanner.CreateQRCodeActivity"
+            android:targetPackage="xyz.mzc6838.qrscanner"/>
+
+        <categories android:name="android.shortcut.conversation" />
+
+
+    </shortcut>
 </shortcuts>

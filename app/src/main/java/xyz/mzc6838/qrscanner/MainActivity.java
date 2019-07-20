@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     Button scan;
     Button getWord;
     Button fightImg;
+    Button createQRCode;
 
 
     @Override
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         scan = findViewById(R.id.scan);
         getWord = findViewById(R.id.getWord);
         fightImg = findViewById(R.id.fightImgButton);
+        createQRCode = findViewById(R.id.createQRCode);
 
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, FightImgActivity.class);
                 startActivity(intent);
             }
+        });
+
+        createQRCode.setOnClickListener((v)->{
+            Intent intent = new Intent(MainActivity.this, CreateQRCodeActivity.class);
+            startActivity(intent);
         });
 
     }
