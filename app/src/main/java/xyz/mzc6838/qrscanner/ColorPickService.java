@@ -114,6 +114,9 @@ public class ColorPickService extends Service {
         super.onDestroy();
         if(floatLayer != null)
             windowManager.removeView(floatLayer);
+
+        if(notificationRec != null)
+            unregisterReceiver(notificationRec);
     }
 
     public class NotificationRec extends BroadcastReceiver{
