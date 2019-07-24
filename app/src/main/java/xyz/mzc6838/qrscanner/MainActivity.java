@@ -2,16 +2,23 @@ package xyz.mzc6838.qrscanner;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -50,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     Button getWord;
     Button fightImg;
     Button createQRCode;
+    Button colorPicker;
 
 
     @Override
@@ -65,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         getWord = findViewById(R.id.getWord);
         fightImg = findViewById(R.id.fightImgButton);
         createQRCode = findViewById(R.id.createQRCode);
+        colorPicker = findViewById(R.id.colorPickerButton);
 
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +106,50 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, CreateQRCodeActivity.class);
             startActivity(intent);
         });
+
+        colorPicker.setOnClickListener((v)->{
+            //TODO 取色器service创建 与 通知的创建
+            Intent intent = new Intent(MainActivity.this, ColorPickService.class);
+            startService(intent);
+
+            Notification notification;
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                NotificationChannel notificationChannel = new NotificationChannel("mzc6838", "close_color_picker", NotificationManager.IMPORTANCE_HIGH);
+                notificationChannel.enableLights(false);
+                notificationChannel.setShowBadge(true);
+                if(notificationManager != null)
+                    notificationManager.createNotificationChannel(notificationChannel);
+            }
+
+            Intent intent1 = new Intent("xyz.mzc6838.QRScanner.action.CLOSE_COLOR_PICKER");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent1, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            notification = new Notification.Builder(this, "mzc6838")
+                    .setContentTitle("QRScanner")
+                    .setContentText("点击这里关闭取色器")
+                    .setWhen(System.currentTimeMillis())
+                    .setAutoCancel(true)
+                    .setOngoing(true)
+                    .setContentIntent(pendingIntent)
+                    .build();
+            }else{
+                notification = new NotificationCompat.Builder(this)
+                        .setContentTitle("QRScanner")
+                        .setContentText("点击这里关闭取色器")
+                        .setWhen(System.currentTimeMillis())
+                        .setAutoCancel(true)
+                        .setOngoing(true)
+                        .setContentIntent(pendingIntent)
+                        .build();
+            }
+
+            if(notificationManager != null)
+                notificationManager.notify(255, notification);
+        });
+
 
     }
 
