@@ -1,5 +1,6 @@
 package xyz.mzc6838.qrscanner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
@@ -14,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,6 +38,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.annotations.EverythingIsNonNull;
 
 public class FightImgActivity extends AppCompatActivity {
 
@@ -86,11 +89,12 @@ public class FightImgActivity extends AppCompatActivity {
 
                 Call call = okHttpClient.newCall(request);
                 call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        return;
-                    }
 
+                    @EverythingIsNonNull
+                    @Override
+                    public void onFailure(Call call, IOException e) {}
+
+                    @EverythingIsNonNull
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
 
@@ -113,20 +117,17 @@ public class FightImgActivity extends AppCompatActivity {
                             }
                             fos.flush();
                         }catch (Exception e){
+
                         }finally {
                             try{
                                 if(is != null){
                                     is.close();
                                 }
-                            }catch (Exception e){
-
-                            }
+                            }catch (Exception e){}
                             try{
                                 if(fos != null)
                                     fos.close();
-                            }catch (Exception e){
-
-                            }
+                            }catch (Exception e){}
                         }
 
                         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -227,12 +228,13 @@ public class FightImgActivity extends AppCompatActivity {
                 Call call = okHttpClient.newCall(request);
 
                 call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-
-                    }
 
                     @Override
+                    @EverythingIsNonNull
+                    public void onFailure(Call call, IOException e) {}
+
+                    @Override
+                    @EverythingIsNonNull
                     public void onResponse(Call call, Response response) throws IOException {
                         Gson gson = new Gson();
                         ResponseFromServer responseFromServer;
@@ -243,18 +245,16 @@ public class FightImgActivity extends AppCompatActivity {
                             Looper.loop();
                         }
 
+                        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if(inputMethodManager != null)
+                            inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
                         imageInfoList.clear();
                         imageInfoList.addAll(responseFromServer.data.getList());
 
                         //Log.d("imageInfoList", imageInfoList.get(0).getImage_url());
 
-                        FightImgActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //Log.d("TAG", "run: runOnUiThread");
-                                imageAdapter.notifyDataSetChanged();
-                            }
-                        });
+                        FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
                     }
                 });
             }

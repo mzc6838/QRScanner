@@ -1,5 +1,6 @@
 package xyz.mzc6838.qrscanner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -70,12 +72,13 @@ public class CreateQRCodeActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(inputMethodManager != null)
+                    inputMethodManager.hideSoftInputFromWindow(editInfo.getWindowToken(), 0);
                 //bitmap.recycle(); There's no need to call this method after Android version 2.3.3.
             }
         });
-        cleanInput.setOnClickListener((v)->{
-            editInfo.setText("");
-        });
+        cleanInput.setOnClickListener((v)->editInfo.setText(""));
         QRCode.setOnLongClickListener((v)->{
             BitmapDrawable bitmapDrawable = (BitmapDrawable)QRCode.getDrawable();
             Bitmap bitmap = bitmapDrawable.getBitmap();
