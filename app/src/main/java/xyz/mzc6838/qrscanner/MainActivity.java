@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                NotificationChannel notificationChannel = new NotificationChannel("mzc6838", "close_color_picker", NotificationManager.IMPORTANCE_HIGH);
+                NotificationChannel notificationChannel = new NotificationChannel("mzc6838", "QRScanner", NotificationManager.IMPORTANCE_HIGH);
                 notificationChannel.enableLights(false);
                 notificationChannel.setShowBadge(true);
                 if(notificationManager != null)
@@ -129,25 +129,29 @@ public class MainActivity extends AppCompatActivity {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             notification = new Notification.Builder(this, "mzc6838")
                     .setContentTitle("QRScanner")
+                    .setTicker("取色器已开启")
                     .setContentText("点击这里关闭取色器")
                     .setWhen(System.currentTimeMillis())
-                    .setAutoCancel(true)
                     .setOngoing(true)
+                    .setAutoCancel(true)
+                    .setSmallIcon(R.mipmap.ic_launcher_my_round)
                     .setContentIntent(pendingIntent)
                     .build();
             }else{
                 notification = new NotificationCompat.Builder(this)
                         .setContentTitle("QRScanner")
+                        .setTicker("取色器已开启")
                         .setContentText("点击这里关闭取色器")
                         .setWhen(System.currentTimeMillis())
                         .setAutoCancel(true)
                         .setOngoing(true)
+                        .setSmallIcon(R.mipmap.ic_launcher_my_round)
                         .setContentIntent(pendingIntent)
                         .build();
             }
 
             if(notificationManager != null)
-                notificationManager.notify(255, notification);
+                new Thread(()->notificationManager.notify(255, notification)).run();
         });
 
 
