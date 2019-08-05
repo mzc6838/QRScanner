@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                NotificationChannel notificationChannel = new NotificationChannel("mzc6838", "close_color_picker", NotificationManager.IMPORTANCE_HIGH);
+                NotificationChannel notificationChannel = new NotificationChannel("mzc6838", "close_color_picker", NotificationManager.IMPORTANCE_DEFAULT);
                 notificationChannel.enableLights(false);
                 notificationChannel.setShowBadge(true);
                 if(notificationManager != null)
@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     .setSmallIcon(R.mipmap.ic_launcher_my_round)
                     .setAutoCancel(true)
                     .setOngoing(true)
+                    .setSmallIcon(R.mipmap.ic_launcher_my_round)
                     .setContentIntent(pendingIntent)
                     .build();
             }else{

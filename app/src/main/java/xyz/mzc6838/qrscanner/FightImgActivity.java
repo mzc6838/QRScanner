@@ -35,6 +35,7 @@ import java.util.ListIterator;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -221,8 +222,13 @@ public class FightImgActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                FormBody formBody = new FormBody.Builder()
+                        .add("keyword", "" + editText.getText()).build();
+
                 Request request = new Request.Builder()
-                        .url("https://www.doutula.com/api/search?keyword=" + editText.getText() + "&mime=0&page=1")
+                        .url("http://toothless.mzc6838.xyz/fightImg.php")
+                        .post(formBody)
                         .build();
 
                 Call call = okHttpClient.newCall(request);
