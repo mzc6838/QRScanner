@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="50dp"
-    android:layout_height="50dp"
-    android:orientation="horizontal"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:orientation="vertical"
     android:background="#FFF">
 
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/serviceImage"/>
+
     <Button
-        android:layout_width="50pt"
-        android:layout_height="20pt"
-        android:id="@+id/qwe" />
+        android:layout_width="30pt"
+        android:layout_height="15pt"
+        android:text="hahah"
+        android:id="@+id/reTake"/>
 
 </LinearLayout>

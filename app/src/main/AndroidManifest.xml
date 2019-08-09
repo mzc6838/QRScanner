@@ -40,8 +40,9 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".CreateQRCodeActivity"
             android:parentActivityName=".MainActivity"/>
-        <service android:name=".ColorPickService"
-            android:enabled="true" />
+        <service android:name=".ColorPickService">
+
+        </service>
     </application>
 
 </manifest>

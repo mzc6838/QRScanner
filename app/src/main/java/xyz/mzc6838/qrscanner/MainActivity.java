@@ -6,24 +6,43 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.VirtualDisplay;
+import android.media.MediaRecorder;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
 import android.os.Build;
+import android.os.IBinder;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -48,6 +67,7 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -58,6 +78,11 @@ public class MainActivity extends AppCompatActivity {
     Button fightImg;
     Button createQRCode;
     Button colorPicker;
+
+    MediaProjectionManager mMediaProjectionManager;
+    //static MediaProjection mMediaProjection;
+
+    SurfaceView mSurfaceView;
 
 
     @Override
@@ -74,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         fightImg = findViewById(R.id.fightImgButton);
         createQRCode = findViewById(R.id.createQRCode);
         colorPicker = findViewById(R.id.colorPickerButton);
+
+        //mSurfaceView = findViewById(R.id.mSurface);
 
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,9 +135,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         colorPicker.setOnClickListener((v)->{
-            //TODO 取色器service创建 与 通知的创建
-            Intent intent = new Intent(MainActivity.this, ColorPickService.class);
-            startService(intent);
 
             Notification notification;
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -151,6 +175,9 @@ public class MainActivity extends AppCompatActivity {
 
             if(notificationManager != null)
                 notificationManager.notify(255, notification);
+
+            mMediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), 5);
         });
 
 
@@ -164,6 +191,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        switch(requestCode){
+            case (5):{
+                if(resultCode == RESULT_OK){
+                    //mMediaProjection = mMediaProjectionManager.getMediaProjection(requestCode, data);
+                    Intent intent = new Intent(MainActivity.this, ColorPickService.class);
+                    intent.putExtra("resultCode", resultCode);
+                    intent.putExtra("data", data);
+
+                    this.startService(intent);
+                }
+                break;
+            }
+        }
     }
 
     @Override
@@ -179,5 +220,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }
