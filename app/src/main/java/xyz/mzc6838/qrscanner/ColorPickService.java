@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
-import android.hardware.display.VirtualDisplay;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
@@ -21,11 +21,12 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.nio.ByteBuffer;
 
@@ -37,58 +38,55 @@ public class ColorPickService extends Service {
 
     private WindowManager windowManager;
     private View floatLayer;
-    //Button close;
     NotificationRec notificationRec;
-
-    SurfaceView mSurface;
 
     Button mButton;
 
-    MediaProjectionManager mediaProjectionManager;
     MediaProjection mediaProjection = null;
-    VirtualDisplay virtualDisplay;
     ImageReader imageReader = null;
     ImageView imageView;
+    Bitmap bitmap, bigBitmap;
+    TextView colorText;
+    LinearLayout linearLayout;
 
     int resultCode;
+    int width;
+    int height;
+    int dpi;
     Intent data;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         resultCode = intent.getIntExtra("resultCode", -1);
         data = intent.getParcelableExtra("data");
-
-        Log.d("", "onStartCommand: 1");
-
+        width = intent.getIntExtra("width", 0);
+        height = intent.getIntExtra("height", 0);
+        dpi = intent.getIntExtra("dpi", 0);
 
         mediaProjection = ((MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE)).getMediaProjection(resultCode, data);
-        imageReader = ImageReader.newInstance(500, 500, PixelFormat.RGBA_8888, 2);
+        imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 1);
 
-        Log.d("resultCode", resultCode + "\n");
-        Log.d("data", data.toString());
-
-        mediaProjection.createVirtualDisplay("mediaProjection", 500, 500, 300,
+        mediaProjection.createVirtualDisplay("mediaProjection", width, height, dpi,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 imageReader.getSurface(),
                 null,null);
 
 
         SystemClock.sleep(1000);
-        Image image = imageReader.acquireNextImage();
+        Image image = imageReader.acquireLatestImage();
         Image.Plane[] plane = image.getPlanes();
         ByteBuffer byteBuffer = plane[0].getBuffer();
         int pixelStride = plane[0].getPixelStride();
         int rowStride = plane[0].getRowStride();
         int rowPadding = rowStride - pixelStride * image.getWidth();
-        Bitmap bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
         bitmap.copyPixelsFromBuffer(byteBuffer);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, image.getWidth(), image.getHeight());
 
         imageView.setImageBitmap(bitmap);
         image.close();
 
-
-        return Service.START_STICKY;
+        return Service.START_NOT_STICKY;
     }
 
     @Nullable
@@ -110,7 +108,8 @@ public class ColorPickService extends Service {
         floatLayer = LayoutInflater.from(this).inflate(R.layout.service_color_picker, null);
 
         imageView = floatLayer.findViewById(R.id.serviceImage);
-        mButton = floatLayer.findViewById(R.id.reTake);
+        colorText = floatLayer.findViewById(R.id.colorRange);
+        linearLayout = floatLayer.findViewById(R.id.colorPickerBackground);
 
         notificationRec = new NotificationRec();
 
@@ -132,7 +131,7 @@ public class ColorPickService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.TOP | Gravity.LEFT;
-        params.x = 10;
+        params.x = 100;
         params.y = 100;
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -141,23 +140,6 @@ public class ColorPickService extends Service {
 
         setOnTouchListener(params);
 
-        //close = floatLayer.findViewById(R.id.qwe);
-        //close.setOnClickListener((v)->stopSelf());
-
-        mButton.setOnClickListener((v)->{
-            Image image = imageReader.acquireNextImage();
-            Image.Plane[] plane = image.getPlanes();
-            ByteBuffer byteBuffer = plane[0].getBuffer();
-            int pixelStride = plane[0].getPixelStride();
-            int rowStride = plane[0].getRowStride();
-            int rowPadding = rowStride - pixelStride * image.getWidth();
-            Bitmap bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
-            bitmap.copyPixelsFromBuffer(byteBuffer);
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, image.getWidth(), image.getHeight());
-
-            imageView.setImageBitmap(bitmap);
-            image.close();
-        });
     }
 
     private void setOnTouchListener(final WindowManager.LayoutParams params){
@@ -176,10 +158,34 @@ public class ColorPickService extends Service {
                         startY = params.y;
                         startTouchX = event.getRawX();
                         startTouchY = event.getRawY();
+
+                        Image image = imageReader.acquireLatestImage();
+                        Image.Plane[] plane = image.getPlanes();
+                        ByteBuffer byteBuffer = plane[0].getBuffer();
+                        int pixelStride = plane[0].getPixelStride();
+                        int rowStride = plane[0].getRowStride();
+                        int rowPadding = rowStride - pixelStride * image.getWidth();
+                        bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
+                        bitmap.copyPixelsFromBuffer(byteBuffer);
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, image.getWidth(), image.getHeight());
+
+                        imageView.setImageBitmap(bitmap);
+                        image.close();
+
                         return true;
+
                     case MotionEvent.ACTION_MOVE:
                         params.x = startX + (int) (event.getRawX() - startTouchX);
                         params.y = startY + (int) (event.getRawY() - startTouchY);
+
+                        //imageView.setImageBitmap(Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50));
+                        bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 35, 35);
+                        imageView.setImageBitmap(bigBitmap);
+                        int colorDec = bigBitmap.getPixel(bigBitmap.getWidth() / 2, bigBitmap.getHeight() / 2);
+
+                        linearLayout.setBackgroundColor(colorDec);
+                        colorText.setText(Color.red(colorDec) + "," + Color.green(colorDec) + "," + Color.blue(colorDec));
+                        colorText.setTextColor(colorDec);
 
                         windowManager.updateViewLayout(floatLayer, params);
 

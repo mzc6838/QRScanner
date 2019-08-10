@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="80dp"
-    android:layout_height="80dp"
+    android:layout_width="130dp"
+    android:layout_height="130dp"
     android:orientation="vertical"
-    android:background="#FFF">
+    android:background="#000"
+    android:id="@+id/colorPickerBackground">
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/serviceImage"/>
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/serviceImage"
+        android:layout_gravity="center"/>
 
-    <Button
-        android:layout_width="30pt"
-        android:layout_height="15pt"
-        android:text="hahah"
-        android:id="@+id/reTake"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:id="@+id/colorRange" />
 
 </LinearLayout>

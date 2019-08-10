@@ -35,6 +35,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -197,6 +198,14 @@ public class MainActivity extends AppCompatActivity {
                 if(resultCode == RESULT_OK){
                     //mMediaProjection = mMediaProjectionManager.getMediaProjection(requestCode, data);
                     Intent intent = new Intent(MainActivity.this, ColorPickService.class);
+
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+                    intent.putExtra("width", displayMetrics.widthPixels);
+                    intent.putExtra("height", displayMetrics.heightPixels);
+                    intent.putExtra("dpi", displayMetrics.densityDpi);
+
                     intent.putExtra("resultCode", resultCode);
                     intent.putExtra("data", data);
 
