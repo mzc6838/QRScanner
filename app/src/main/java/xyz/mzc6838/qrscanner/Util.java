@@ -1,5 +1,8 @@
 package xyz.mzc6838.qrscanner;
 
+import android.content.Context;
+import android.graphics.Color;
+
 import java.util.Random;
 
 public class Util {
@@ -7,7 +10,7 @@ public class Util {
     /**
      * 构造随机字符串
      * @param length 随机字符串长度
-     * @return 生成的随机字符
+     * @return String 生成的随机字符
      * */
     public static String getRandomString(int length){
         String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -23,7 +26,7 @@ public class Util {
     /**
      * 十进制颜色转十六进制字符串
      * @param color 十进制颜色数值
-     * @return 十六进制颜色字符串
+     * @return String 十六进制颜色字符串
      * */
     public static String getColorString(int color){
         String colorHex = "";
@@ -66,9 +69,51 @@ public class Util {
     }
 
     /**
+     * 取反色
+     * @param r 原始红色
+     * @param g 原始绿色
+     * @param b 原始蓝色
+     * @return String 取反色后的十六进制格式颜色
+     * */
+    public static String getInvertColorString(int r, int g, int b){
+        r = r ^ 0xff;
+        g = g ^ 0xff;
+        b = b ^ 0xff;
+        String result = "#";
+        result += decToHex(r) + decToHex(g) + decToHex(b);
+        return result;
+    }
+
+    /**
+     * 取反色
+     * @param color 原始颜色
+     * @return int 取反色后的颜色
+     * */
+    public static int getInvertColor(int color){
+        int r = (int)(Color.red(color)) ^ 0xff;
+        int g = (int)(Color.green(color)) ^ 0xff;
+        int b = (int)(Color.blue(color)) ^ 0xff;
+
+        long t = Color.pack(r, g, b);
+
+        return Color.rgb(r, g, b);
+    }
+
+    /**
+     * dp转px
+     * @param context
+     * @param dp
+     * @return
+     * */
+    public static int dp2px(Context context, int dp){
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int)(dp * scale + 0.5f);
+    }
+
+    /**
      * 十进制转十六进制
      * @param Dec 传入的十进制
-     * @return 十进制对应的十六进制
+     * @return String 十进制对应的十六进制
      * */
     public static String decToHex(int Dec){
         String Hex = "";
@@ -109,6 +154,5 @@ public class Util {
         }
         return Hex;
     }
-
 
 }

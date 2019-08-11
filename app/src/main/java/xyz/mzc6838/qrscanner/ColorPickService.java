@@ -17,15 +17,14 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.nio.ByteBuffer;
@@ -40,14 +39,12 @@ public class ColorPickService extends Service {
     private View floatLayer;
     NotificationRec notificationRec;
 
-    Button mButton;
-
     MediaProjection mediaProjection = null;
     ImageReader imageReader = null;
     ImageView imageView;
     Bitmap bitmap, bigBitmap;
     TextView colorText;
-    LinearLayout linearLayout;
+    RelativeLayout relativeLayout;
 
     int resultCode;
     int width;
@@ -109,7 +106,9 @@ public class ColorPickService extends Service {
 
         imageView = floatLayer.findViewById(R.id.serviceImage);
         colorText = floatLayer.findViewById(R.id.colorRange);
-        linearLayout = floatLayer.findViewById(R.id.colorPickerBackground);
+        relativeLayout = floatLayer.findViewById(R.id.colorPickerBackground);
+
+        relativeLayout.setVisibility(View.VISIBLE);
 
         notificationRec = new NotificationRec();
 
@@ -133,6 +132,8 @@ public class ColorPickService extends Service {
         params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 100;
         params.y = 100;
+        params.height = Util.dp2px(getBaseContext(), 150);
+        params.width = Util.dp2px(getBaseContext(), 150);
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         if(windowManager != null)
@@ -159,6 +160,9 @@ public class ColorPickService extends Service {
                         startTouchX = event.getRawX();
                         startTouchY = event.getRawY();
 
+                        params.height = Util.dp2px(getBaseContext(), 150);
+                        params.width = Util.dp2px(getBaseContext(), 150);
+
                         Image image = imageReader.acquireLatestImage();
                         Image.Plane[] plane = image.getPlanes();
                         ByteBuffer byteBuffer = plane[0].getBuffer();
@@ -178,14 +182,28 @@ public class ColorPickService extends Service {
                         params.x = startX + (int) (event.getRawX() - startTouchX);
                         params.y = startY + (int) (event.getRawY() - startTouchY);
 
-                        //imageView.setImageBitmap(Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50));
-                        bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 35, 35);
+                        //TODO edge judgement
+                        if((int)event.getRawX() + 50 > bitmap.getWidth()){
+                            bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(),
+                                    (int)event.getRawX() - bitmap.getWidth() + 50, 50);
+                        }else if((int)event.getRawY() + 50 > bitmap.getHeight()){
+                            bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(),
+                                    50, (int)event.getRawY() - bitmap.getHeight() + 50);
+                        }else{
+                            bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50);
+
+                        }
+
+                        //bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50);
                         imageView.setImageBitmap(bigBitmap);
                         int colorDec = bigBitmap.getPixel(bigBitmap.getWidth() / 2, bigBitmap.getHeight() / 2);
 
-                        linearLayout.setBackgroundColor(colorDec);
+                        relativeLayout.setBackgroundColor(colorDec);
                         colorText.setText(Color.red(colorDec) + "," + Color.green(colorDec) + "," + Color.blue(colorDec));
-                        colorText.setTextColor(colorDec);
+                        colorText.setTextColor(Util.getInvertColor(colorDec));
+
+                        params.height = Util.dp2px(getBaseContext(), 150);
+                        params.width = Util.dp2px(getBaseContext(), 150);
 
                         windowManager.updateViewLayout(floatLayer, params);
 
