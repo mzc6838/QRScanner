@@ -35,6 +35,7 @@ import java.util.ListIterator;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -48,6 +49,11 @@ public class FightImgActivity extends AppCompatActivity {
     RecyclerView imageListRecyclerView;
     List<ImgInfo> imageInfoList;
     ImageAdapter imageAdapter;
+
+    int more = 0;
+    int count = 0;
+    int page = 1;
+    String keyword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +83,51 @@ public class FightImgActivity extends AppCompatActivity {
         imageListRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         //imageListRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         imageListRecyclerView.setAdapter(imageAdapter);
+        imageListRecyclerView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY)-> {
+                if(!imageListRecyclerView.canScrollVertically(1)){
+                    if(more == 1){
+
+                        page++;
+
+                        FormBody formBody = new FormBody.Builder()
+                                .add("page", "" + page)
+                                .add("keyword", keyword)
+                                .build();
+                        Request request = new Request.Builder()
+                                .url("http://toothless.mzc6838.xyz/fightImg.php")
+                                .post(formBody)
+                                .build();
+                        Call call = okHttpClient.newCall(request);
+
+                        call.enqueue(new Callback() {
+                            @EverythingIsNonNull
+                            @Override
+                            public void onFailure(Call call, IOException e) {}
+
+                            @EverythingIsNonNull
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                                Gson gson = new Gson();
+                                ResponseFromServer responseFromServer = gson.fromJson(response.body().string(), ResponseFromServer.class);
+
+                                more = responseFromServer.getData().getMore();
+
+                                imageInfoList.addAll(responseFromServer.getData().getList());
+
+                                FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
+
+                            }
+                        });
+                    }else {
+                        more = 0;
+
+                        Toast.makeText(this, "没有更多了", Toast.LENGTH_LONG).show();
+
+                    }
+                }
+        });
+
+
 
         imageAdapter.setOnItemLongClickListener(new ImageAdapter.OnItemLongClickListener() {
             @Override
@@ -221,8 +272,19 @@ public class FightImgActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                page = 1;
+                keyword = "" + editText.getText();
+                imageListRecyclerView.scrollToPosition(0);
+
+                FormBody formBody = new FormBody.Builder()
+                        .add("keyword", "" + editText.getText())
+                        .add("page", "" + page)
+                        .build();
+
                 Request request = new Request.Builder()
-                        .url("https://www.doutula.com/api/search?keyword=" + editText.getText() + "&mime=0&page=1")
+                        .url("http://toothless.mzc6838.xyz/fightImg.php")
+                        .post(formBody)
                         .build();
 
                 Call call = okHttpClient.newCall(request);
@@ -244,6 +306,8 @@ public class FightImgActivity extends AppCompatActivity {
                             Toast.makeText(FightImgActivity.this, "什么都没找到", Toast.LENGTH_SHORT).show();
                             Looper.loop();
                         }
+
+                        more = responseFromServer.getData().getMore();
 
                         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         if(inputMethodManager != null)
