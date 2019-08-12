@@ -1,7 +1,11 @@
 package xyz.mzc6838.qrscanner;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 
 import java.util.Random;
 
@@ -28,43 +32,9 @@ public class Util {
      * @param color 十进制颜色数值
      * @return String 十六进制颜色字符串
      * */
-    public static String getColorString(int color){
-        String colorHex = "";
-        while (color != 0){
-            switch (color % 16){
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    colorHex = (color % 16) + colorHex;
-                    break;
-                case 10:
-                    colorHex = "A" + colorHex;
-                    break;
-                case 11:
-                    colorHex = "B" + colorHex;
-                    break;
-                case 12:
-                    colorHex = "C" + colorHex;
-                    break;
-                case 13:
-                    colorHex = "D" + colorHex;
-                    break;
-                case 14:
-                    colorHex = "E" + colorHex;
-                    break;
-                case 15:
-                    colorHex = "F" + colorHex;
-                    break;
-            }
-            color /= 16;
-        }
+    public static String getColorString(int r, int g, int b){
+        String colorHex = "#";
+        colorHex += (decToHex(r) + decToHex(g) + decToHex(b));
         return colorHex;
     }
 
@@ -103,7 +73,7 @@ public class Util {
      * dp转px
      * @param context
      * @param dp
-     * @return
+     * @return int px
      * */
     public static int dp2px(Context context, int dp){
         final float scale = context.getResources().getDisplayMetrics().density;
@@ -114,8 +84,14 @@ public class Util {
      * 十进制转十六进制
      * @param Dec 传入的十进制
      * @return String 十进制对应的十六进制
+     * @warning 适用于颜色 例如#0返回"00"
      * */
     public static String decToHex(int Dec){
+
+        if(Dec == 0){
+            return "00";
+        }
+
         String Hex = "";
         while (Dec != 0){
             switch(Dec % 16){
@@ -152,7 +128,52 @@ public class Util {
             }
             Dec /= 16;
         }
+        if(Hex.length() == 1)
+            Hex = "0" + Hex;
         return Hex;
     }
+
+    /**
+     * 为Bitmap绘制背景
+     * @param radius 背景半径
+     * @param color 背景颜色
+     * @param orginBitmap 原始Bitmap
+     * @return Bitmap 绘制背景后的Bitmap
+     * */
+    public static Bitmap drawBg4Bitmap(int radius, int color, Bitmap orginBitmap){
+        Paint paint = new Paint();
+        paint.setColor(color);
+        Bitmap bitmap = Bitmap.createBitmap(orginBitmap.getWidth() + radius,
+                orginBitmap.getHeight() + radius,
+                orginBitmap.getConfig());
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawRect(0, 0, orginBitmap.getWidth() + radius, orginBitmap.getHeight() + radius, paint);
+        canvas.drawBitmap(orginBitmap, 0, 0, paint);
+        return bitmap;
+    }
+
+    /**
+     * 为bitmap绘制网格线
+     * @param bitmap 传入的Bitmap
+     * @param pixInterval 网格线之间的距离 单位：px
+     * @return Bitmap 绘制后的Bitmap
+     * */
+    public static Bitmap drawMeshLine4Bitmap(Bitmap bitmap, int pixInterval){
+        Bitmap copy = Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(), Bitmap.Config.ARGB_8888);  //很重要
+        Canvas canvas = new Canvas(copy);
+        Paint paint = new Paint();
+        paint.setStrokeWidth(1);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.BLACK);
+        canvas.drawBitmap(bitmap,new Matrix(),paint);
+        for (int i = 0; i < bitmap.getHeight() / pixInterval; i++) {
+            canvas.drawLine(0, i * pixInterval, bitmap.getWidth(), i * pixInterval, paint);
+        }
+        for (int i = 0; i < bitmap.getWidth() / pixInterval; i++) {
+            canvas.drawLine(i * pixInterval, 0, i * pixInterval, bitmap.getHeight(), paint);
+        }
+        return copy;
+    }
+
 
 }

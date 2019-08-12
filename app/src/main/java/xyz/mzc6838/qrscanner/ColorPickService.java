@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
 import android.media.Image;
@@ -41,9 +43,9 @@ public class ColorPickService extends Service {
 
     MediaProjection mediaProjection = null;
     ImageReader imageReader = null;
-    ImageView imageView;
-    Bitmap bitmap, bigBitmap;
-    TextView colorText;
+    ImageView imageView, aimLineImage;
+    Bitmap bitmap, bigBitmap, aimLineBitmap;
+    TextView colorText, colorTextHex;
     RelativeLayout relativeLayout;
 
     int resultCode;
@@ -106,7 +108,9 @@ public class ColorPickService extends Service {
 
         imageView = floatLayer.findViewById(R.id.serviceImage);
         colorText = floatLayer.findViewById(R.id.colorRange);
+        colorTextHex = floatLayer.findViewById(R.id.colorRangeHex);
         relativeLayout = floatLayer.findViewById(R.id.colorPickerBackground);
+        aimLineImage = floatLayer.findViewById(R.id.aimLine);
 
         relativeLayout.setVisibility(View.VISIBLE);
 
@@ -141,6 +145,16 @@ public class ColorPickService extends Service {
 
         setOnTouchListener(params);
 
+        aimLineBitmap = Bitmap.createBitmap(Util.dp2px(getBaseContext(), 150), Util.dp2px(getBaseContext(), 150), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(aimLineBitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setStrokeWidth(2.5f);
+        canvas.drawLine(0, aimLineBitmap.getHeight() / 2, aimLineBitmap.getWidth(), aimLineBitmap.getHeight() / 2, paint);
+        canvas.drawLine(aimLineBitmap.getWidth() / 2, 0, aimLineBitmap.getWidth() / 2, aimLineBitmap.getHeight(), paint);
+
+        aimLineImage.setImageBitmap(aimLineBitmap);
+
     }
 
     private void setOnTouchListener(final WindowManager.LayoutParams params){
@@ -169,12 +183,17 @@ public class ColorPickService extends Service {
                         int pixelStride = plane[0].getPixelStride();
                         int rowStride = plane[0].getRowStride();
                         int rowPadding = rowStride - pixelStride * image.getWidth();
-                        bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
+                        bitmap = Bitmap.createBitmap((image.getWidth() + rowPadding / pixelStride),
+                                image.getHeight(),
+                                Bitmap.Config.ARGB_8888);
                         bitmap.copyPixelsFromBuffer(byteBuffer);
                         bitmap = Bitmap.createBitmap(bitmap, 0, 0, image.getWidth(), image.getHeight());
+                        bitmap = Util.drawBg4Bitmap(100, Color.BLACK, bitmap);
 
                         imageView.setImageBitmap(bitmap);
                         image.close();
+
+                        aimLineImage.setImageBitmap(aimLineBitmap);
 
                         return true;
 
@@ -182,30 +201,22 @@ public class ColorPickService extends Service {
                         params.x = startX + (int) (event.getRawX() - startTouchX);
                         params.y = startY + (int) (event.getRawY() - startTouchY);
 
-                        //TODO edge judgement
-                        if((int)event.getRawX() + 50 > bitmap.getWidth()){
-                            bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(),
-                                    (int)event.getRawX() - bitmap.getWidth() + 50, 50);
-                        }else if((int)event.getRawY() + 50 > bitmap.getHeight()){
-                            bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(),
-                                    50, (int)event.getRawY() - bitmap.getHeight() + 50);
-                        }else{
-                            bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50);
-
-                        }
-
-                        //bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50);
+                        bigBitmap = Bitmap.createBitmap(bitmap, (int)event.getRawX(), (int)event.getRawY(), 50, 50);
                         imageView.setImageBitmap(bigBitmap);
                         int colorDec = bigBitmap.getPixel(bigBitmap.getWidth() / 2, bigBitmap.getHeight() / 2);
 
                         relativeLayout.setBackgroundColor(colorDec);
-                        colorText.setText(Color.red(colorDec) + "," + Color.green(colorDec) + "," + Color.blue(colorDec));
+                        colorText.setText("r:" + Color.red(colorDec) + ", g:" + Color.green(colorDec) + ", b:" + Color.blue(colorDec));
+                        colorTextHex.setText(Util.getColorString(Color.red(colorDec), Color.green(colorDec), Color.blue(colorDec)));
+                        colorTextHex.setTextColor(Util.getInvertColor(colorDec));
                         colorText.setTextColor(Util.getInvertColor(colorDec));
 
                         params.height = Util.dp2px(getBaseContext(), 150);
                         params.width = Util.dp2px(getBaseContext(), 150);
-
+                        aimLineImage.setZ(999);
+                        aimLineImage.setImageBitmap(aimLineBitmap);
                         windowManager.updateViewLayout(floatLayer, params);
+
 
                         return true;
                 }

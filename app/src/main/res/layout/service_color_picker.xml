@@ -7,6 +7,19 @@
     android:maxHeight="150dp"
     android:id="@+id/colorPickerBackground">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:textAlignment="center"
+        android:id="@+id/colorRangeHex"
+        android:layout_alignParentTop="true"/>
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/aimLine"
+        android:layout_centerInParent="true" />
+
     <ImageView
         android:id="@+id/serviceImage"
         android:layout_width="100dp"
