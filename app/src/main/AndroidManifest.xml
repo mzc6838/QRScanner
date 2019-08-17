@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_my_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,16 +31,16 @@
         <activity android:name="com.google.zxing.client.android.CaptureActivity">
 
         </activity>
-        <activity android:name=".FightImgActivity"
-            android:parentActivityName=".MainActivity">
+        <activity android:name=".activity.FightImgActivity"
+            android:parentActivityName=".activity.MainActivity">
         </activity>
-        <activity android:name=".ScanActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".GetTextActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".CreateQRCodeActivity"
-            android:parentActivityName=".MainActivity"/>
-        <service android:name=".ColorPickService">
+        <activity android:name=".activity.ScanActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity android:name=".activity.GetTextActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity android:name=".activity.CreateQRCodeActivity"
+            android:parentActivityName=".activity.MainActivity"/>
+        <service android:name=".service.ColorPickService">
 
         </service>
     </application>

@@ -1,4 +1,4 @@
-package xyz.mzc6838.qrscanner;
+package xyz.mzc6838.qrscanner.service;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -25,11 +25,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.nio.ByteBuffer;
+
+import xyz.mzc6838.qrscanner.R;
+import xyz.mzc6838.qrscanner.util.Util;
 
 /**
  * Created by mzc6838 on 2019/8/9.

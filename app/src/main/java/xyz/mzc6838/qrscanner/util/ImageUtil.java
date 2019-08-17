@@ -1,4 +1,4 @@
-package xyz.mzc6838.qrscanner;
+package xyz.mzc6838.qrscanner.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;

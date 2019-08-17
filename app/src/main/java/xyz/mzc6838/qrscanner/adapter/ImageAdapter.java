@@ -1,18 +1,18 @@
-package xyz.mzc6838.qrscanner;
+package xyz.mzc6838.qrscanner.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+
+import xyz.mzc6838.qrscanner.baseClass.ImgInfo;
+import xyz.mzc6838.qrscanner.R;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
