@@ -1,4 +1,4 @@
-package xyz.mzc6838.qrscanner;
+package xyz.mzc6838.qrscanner.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +9,8 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -27,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +36,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.annotations.EverythingIsNonNull;
+import xyz.mzc6838.qrscanner.adapter.ImageAdapter;
+import xyz.mzc6838.qrscanner.baseClass.ImgInfo;
+import xyz.mzc6838.qrscanner.R;
+import xyz.mzc6838.qrscanner.baseClass.ResponseFromServer;
 
 public class FightImgActivity extends AppCompatActivity {
 

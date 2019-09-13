@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,8 +22,11 @@ import android.widget.Button;
 
 public class ColorPickService extends Service {
 
+    private static int BROADCAST_SENT = 0;
+
     private  WindowManager windowManager;
     private View floatLayer;
+    Button close;
     NotificationRec notificationRec;
 
     @Nullable
@@ -63,7 +65,7 @@ public class ColorPickService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.TOP | Gravity.START;
+        params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 10;
         params.y = 100;
 
@@ -73,6 +75,8 @@ public class ColorPickService extends Service {
 
         setOnTouchListener(params);
 
+        close = floatLayer.findViewById(R.id.qwe);
+        close.setOnClickListener((v)->stopSelf());
     }
 
     private void setOnTouchListener(final WindowManager.LayoutParams params){
@@ -110,15 +114,12 @@ public class ColorPickService extends Service {
         super.onDestroy();
         if(floatLayer != null)
             windowManager.removeView(floatLayer);
-
-        if(notificationRec != null)
-            unregisterReceiver(notificationRec);
     }
 
     public class NotificationRec extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("xyz.mzc6838.QRScanner.action.CLOSE_COLOR_PICKER")){
+            if(intent.getAction() == "xyz.mzc6838.QRScanner.action.CLOSE_COLOR_PICKER"){
                 stopSelf();
             }
         }

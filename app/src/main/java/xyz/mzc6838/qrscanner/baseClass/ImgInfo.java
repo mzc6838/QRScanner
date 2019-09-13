@@ -1,4 +1,4 @@
-package xyz.mzc6838.qrscanner;
+package xyz.mzc6838.qrscanner.baseClass;
 
 public class ImgInfo{
     public Long out_id;

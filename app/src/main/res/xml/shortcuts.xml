@@ -12,7 +12,7 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="xyz.mzc6838.qrscanner.ScanActivity"
+            android:targetClass="xyz.mzc6838.qrscanner.activity.ScanActivity"
             android:targetPackage="xyz.mzc6838.qrscanner"/>
 
         <categories android:name="android.shortcut.conversation" />
@@ -29,7 +29,7 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="xyz.mzc6838.qrscanner.GetTextActivity"
+            android:targetClass="xyz.mzc6838.qrscanner.activity.GetTextActivity"
             android:targetPackage="xyz.mzc6838.qrscanner"/>
 
         <categories android:name="android.shortcut.conversation" />
@@ -46,7 +46,7 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="xyz.mzc6838.qrscanner.CreateQRCodeActivity"
+            android:targetClass="xyz.mzc6838.qrscanner.activity.CreateQRCodeActivity"
             android:targetPackage="xyz.mzc6838.qrscanner"/>
 
         <categories android:name="android.shortcut.conversation" />

@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="50dp"
-    android:layout_height="50dp"
-    android:orientation="horizontal"
-    android:background="#FFF">
+    android:layout_width="150dp"
+    android:layout_height="150dp"
+    android:maxWidth="150dp"
+    android:maxHeight="150dp"
+    android:id="@+id/colorPickerBackground">
 
-    <Button
-        android:layout_width="50pt"
-        android:layout_height="20pt"
-        android:id="@+id/qwe" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:textAlignment="center"
+        android:id="@+id/colorRangeHex"
+        android:layout_alignParentTop="true"/>
 
-</LinearLayout>
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/aimLine"
+        android:layout_centerInParent="true" />
+
+    <ImageView
+        android:id="@+id/serviceImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:id="@+id/colorRange"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>
