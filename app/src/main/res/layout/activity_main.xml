@@ -27,7 +27,7 @@
 
     <Button
         android:id="@+id/fightImgButton"
-        android:text="斗图(已停止服务)"
+        android:text="斗图"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginStart="5dp"

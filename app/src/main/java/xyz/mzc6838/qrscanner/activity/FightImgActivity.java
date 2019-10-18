@@ -6,11 +6,11 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Looper;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -24,10 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -37,7 +34,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.annotations.EverythingIsNonNull;
 import xyz.mzc6838.qrscanner.adapter.ImageAdapter;
-import xyz.mzc6838.qrscanner.baseClass.ImgInfo;
 import xyz.mzc6838.qrscanner.R;
 import xyz.mzc6838.qrscanner.baseClass.ResponseFromServer;
 
@@ -47,7 +43,7 @@ public class FightImgActivity extends AppCompatActivity {
     EditText editText;
     OkHttpClient okHttpClient;
     RecyclerView imageListRecyclerView;
-    List<ImgInfo> imageInfoList;
+    List<String> imageInfoList;
     ImageAdapter imageAdapter;
 
     int more = 0;
@@ -89,16 +85,16 @@ public class FightImgActivity extends AppCompatActivity {
 
                         page++;
 
-                        FormBody formBody = new FormBody.Builder()
-                                .add("page", "" + page)
-                                .add("keyword", keyword)
-                                .build();
-                        Request request = new Request.Builder()
-                                .url("http://toothless.mzc6838.xyz/fightImg.php")
-                                .post(formBody)
-                                .build();
-                        Call call = okHttpClient.newCall(request);
+                        String urlH = "http://img.mzc6838.xyz:8000/search?";
+                        String urlKeyWord = "keyword=" + keyword;
+                        String urlPage = "&page=" + page;
+                        String url = urlH + urlKeyWord + urlPage;
 
+                        Request request = new Request.Builder()
+                                .url(url)
+                                .build();
+
+                        Call call = okHttpClient.newCall(request);
                         call.enqueue(new Callback() {
                             @EverythingIsNonNull
                             @Override
@@ -110,9 +106,9 @@ public class FightImgActivity extends AppCompatActivity {
                                 Gson gson = new Gson();
                                 ResponseFromServer responseFromServer = gson.fromJson(response.body().string(), ResponseFromServer.class);
 
-                                more = responseFromServer.getData().getMore();
+                                more = responseFromServer.getMore();
 
-                                imageInfoList.addAll(responseFromServer.getData().getList());
+                                imageInfoList.addAll(responseFromServer.getData());
 
                                 FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
 
@@ -120,7 +116,6 @@ public class FightImgActivity extends AppCompatActivity {
                         });
                     }else {
                         more = 0;
-
                         Toast.makeText(this, "没有更多了", Toast.LENGTH_LONG).show();
 
                     }
@@ -132,7 +127,7 @@ public class FightImgActivity extends AppCompatActivity {
         imageAdapter.setOnItemLongClickListener(new ImageAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(View view, int position) {
-                String url = imageInfoList.get(position).getImage_url();
+                String url = imageInfoList.get(position);
 
                 Request request = new Request.Builder()
                         .url(url)
@@ -201,7 +196,7 @@ public class FightImgActivity extends AppCompatActivity {
         imageAdapter.setOnItemClickListener(new ImageAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String url = imageInfoList.get(position).getImage_url();
+                String url = imageInfoList.get(position);
 
                 Request request = new Request.Builder()
                         .url(url)
@@ -277,14 +272,13 @@ public class FightImgActivity extends AppCompatActivity {
                 keyword = "" + editText.getText();
                 imageListRecyclerView.scrollToPosition(0);
 
-                FormBody formBody = new FormBody.Builder()
-                        .add("keyword", "" + editText.getText())
-                        .add("page", "" + page)
-                        .build();
+                String urlH = "http://img.mzc6838.xyz:8000/search?";
+                String urlKeyWord = "keyword=" + keyword;
+                String urlPage = "&page=" + page;
+                String url = urlH + urlKeyWord + urlPage;
 
                 Request request = new Request.Builder()
-                        .url("http://toothless.mzc6838.xyz/fightImg.php")
-                        .post(formBody)
+                        .url(url)
                         .build();
 
                 Call call = okHttpClient.newCall(request);
@@ -300,21 +294,25 @@ public class FightImgActivity extends AppCompatActivity {
                     public void onResponse(Call call, Response response) throws IOException {
                         Gson gson = new Gson();
                         ResponseFromServer responseFromServer;
-                        responseFromServer = gson.fromJson(response.body().string(), ResponseFromServer.class);
+                        String dataFromServer = response.body().string();
+                        responseFromServer = gson.fromJson(dataFromServer, ResponseFromServer.class);
+
+                        Log.d("message", dataFromServer);
+
                         if(responseFromServer.getStatus() == 0){
                             Looper.prepare();
                             Toast.makeText(FightImgActivity.this, "什么都没找到", Toast.LENGTH_SHORT).show();
                             Looper.loop();
                         }
 
-                        more = responseFromServer.getData().getMore();
+                        more = responseFromServer.getMore();
 
                         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         if(inputMethodManager != null)
                             inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
                         imageInfoList.clear();
-                        imageInfoList.addAll(responseFromServer.data.getList());
+                        imageInfoList.addAll(responseFromServer.getData());
 
                         //Log.d("imageInfoList", imageInfoList.get(0).getImage_url());
 
@@ -323,135 +321,5 @@ public class FightImgActivity extends AppCompatActivity {
                 });
             }
         });
-    }
-
-    /**
-     * 可能return空值
-     */
-    static public List<ImgInfo> arrayListToList(ImgInfo[] input){
-        List<ImgInfo> result = new List<ImgInfo>() {
-            @Override
-            public int size() {
-                return 0;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                return false;
-            }
-
-            @Override
-            public Iterator<ImgInfo> iterator() {
-                return null;
-            }
-
-            @Override
-            public Object[] toArray() {
-                return new Object[0];
-            }
-
-            @Override
-            public <T> T[] toArray(T[] ts) {
-                return null;
-            }
-
-            @Override
-            public boolean add(ImgInfo imgInfo) {
-                return false;
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                return false;
-            }
-
-            @Override
-            public boolean containsAll(Collection<?> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends ImgInfo> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(int i, @NonNull Collection<? extends ImgInfo> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean removeAll(Collection<?> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean retainAll(Collection<?> collection) {
-                return false;
-            }
-
-            @Override
-            public void clear() {
-
-            }
-
-            @Override
-            public ImgInfo get(int i) {
-                return null;
-            }
-
-            @Override
-            public ImgInfo set(int i, ImgInfo imgInfo) {
-                return null;
-            }
-
-            @Override
-            public void add(int i, ImgInfo imgInfo) {
-
-            }
-
-            @Override
-            public ImgInfo remove(int i) {
-                return null;
-            }
-
-            @Override
-            public int indexOf(Object o) {
-                return 0;
-            }
-
-            @Override
-            public int lastIndexOf(Object o) {
-                return 0;
-            }
-
-            @NonNull
-            @Override
-            public ListIterator<ImgInfo> listIterator() {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public ListIterator<ImgInfo> listIterator(int i) {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public List<ImgInfo> subList(int i, int i1) {
-                return null;
-            }
-        };
-        //result.addAll(input);
-        for(int i = 0; i < input.length; i++){
-            result.add(input[i]);
-        }
-        return result;
     }
 }

@@ -11,18 +11,17 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-import xyz.mzc6838.qrscanner.baseClass.ImgInfo;
 import xyz.mzc6838.qrscanner.R;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
     public Context mContext;
-    public List<ImgInfo> ImgInfoList;
+    public List<String> ImgInfoList;
 
     private OnItemLongClickListener onItemLongClickListener;
     private OnItemClickListener onItemClickListener;
 
-    public ImageAdapter(Context context, List<ImgInfo> _ImgInfoList){
+    public ImageAdapter(Context context, List<String> _ImgInfoList){
         ImgInfoList = _ImgInfoList;
         mContext = context;
     }
@@ -42,11 +41,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        ImgInfo info = ImgInfoList.get(position);
+        String info = ImgInfoList.get(position);
 
         //Log.d("img info", "???");
 
-        Glide.with(mContext).load(info.getImage_url()).into(holder.imageView);
+        Glide.with(mContext).load(info).into(holder.imageView);
 
 
         if(onItemLongClickListener != null){

@@ -56,32 +56,24 @@ public class MainActivity extends AppCompatActivity {
 
         //mSurfaceView = findViewById(R.id.mSurface);
 
-        scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        scan.setOnClickListener((v)->{
+            if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
+            }else{
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                startActivity(intent);
+            }
+        });
+        getWord.setOnClickListener((v)->{
 
-                if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
-                }else{
-                    Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-                    startActivity(intent);
-                }
-            }
+            Intent innerIntent = new Intent(MainActivity.this,GetTextActivity.class);
+            startActivity(innerIntent);
         });
-        getWord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent innerIntent = new Intent(MainActivity.this,GetTextActivity.class);
-                startActivity(innerIntent);
-            }
-        });
-        fightImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "斗图功能已停用！", Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(MainActivity.this, FightImgActivity.class);
-//                startActivity(intent);
-            }
+        fightImg.setOnClickListener((v)->{
+
+                //Toast.makeText(MainActivity.this, "斗图功能已停用！", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, FightImgActivity.class);
+            startActivity(intent);
         });
 
         createQRCode.setOnClickListener((v)->{
