@@ -12,6 +12,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,9 +46,9 @@ public class FightImgActivity extends AppCompatActivity {
     RecyclerView imageListRecyclerView;
     List<String> imageInfoList;
     ImageAdapter imageAdapter;
+    InputMethodManager inputMethodManager;
 
     int more = 0;
-    int count = 0;
     int page = 1;
     String keyword = "";
 
@@ -72,6 +73,8 @@ public class FightImgActivity extends AppCompatActivity {
         editText = findViewById(R.id.inputKeyWordEditText);
         okHttpClient = new OkHttpClient();
         imageListRecyclerView = findViewById(R.id.imageList);
+
+        inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         imageInfoList = new ArrayList<>();
 
@@ -121,8 +124,6 @@ public class FightImgActivity extends AppCompatActivity {
                     }
                 }
         });
-
-
 
         imageAdapter.setOnItemLongClickListener(new ImageAdapter.OnItemLongClickListener() {
             @Override
@@ -268,57 +269,83 @@ public class FightImgActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                page = 1;
-                keyword = "" + editText.getText();
-                imageListRecyclerView.scrollToPosition(0);
+                searchFromServer();
+                if(inputMethodManager != null)
+                    inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
-                String urlH = "http://img.mzc6838.xyz:8000/search?";
-                String urlKeyWord = "keyword=" + keyword;
-                String urlPage = "&page=" + page;
-                String url = urlH + urlKeyWord + urlPage;
+            }
+        });
 
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
+        editText.setOnEditorActionListener((textView, actionId, keyEvent)->{
 
-                Call call = okHttpClient.newCall(request);
+            if(actionId == EditorInfo.IME_ACTION_SEND
+                    || actionId == EditorInfo.IME_ACTION_DONE
+                    || keyEvent != null
+                    && keyEvent.KEYCODE_ENTER == keyEvent.getKeyCode()
+                    && keyEvent.ACTION_DOWN == keyEvent.getAction()){
 
-                call.enqueue(new Callback() {
+                Log.d("editEdit", "click ");
 
-                    @Override
-                    @EverythingIsNonNull
-                    public void onFailure(Call call, IOException e) {}
+                if(!editText.getText().toString().equals("")){
+                    if(inputMethodManager != null)
+                        inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                    searchFromServer();
+                }
+            }
 
-                    @Override
-                    @EverythingIsNonNull
-                    public void onResponse(Call call, Response response) throws IOException {
-                        Gson gson = new Gson();
-                        ResponseFromServer responseFromServer;
-                        String dataFromServer = response.body().string();
-                        responseFromServer = gson.fromJson(dataFromServer, ResponseFromServer.class);
+            return false;
+        });
+    }
 
-                        Log.d("message", dataFromServer);
+    /**
+     * 从服务器获取图片列表
+     * */
+    private void searchFromServer(){
+        page = 1;
+        keyword = "" + editText.getText();
+        imageListRecyclerView.scrollToPosition(0);
 
-                        if(responseFromServer.getStatus() == 0){
-                            Looper.prepare();
-                            Toast.makeText(FightImgActivity.this, "什么都没找到", Toast.LENGTH_SHORT).show();
-                            Looper.loop();
-                        }
+        String urlH = "http://img.mzc6838.xyz:8000/search?";
+        String urlKeyWord = "keyword=" + keyword;
+        String urlPage = "&page=" + page;
+        String url = urlH + urlKeyWord + urlPage;
 
-                        more = responseFromServer.getMore();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-                        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if(inputMethodManager != null)
-                            inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        Call call = okHttpClient.newCall(request);
 
-                        imageInfoList.clear();
-                        imageInfoList.addAll(responseFromServer.getData());
+        call.enqueue(new Callback() {
 
-                        //Log.d("imageInfoList", imageInfoList.get(0).getImage_url());
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call call, IOException e) {}
 
-                        FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
-                    }
-                });
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call call, Response response) throws IOException {
+                Gson gson = new Gson();
+                ResponseFromServer responseFromServer;
+                String dataFromServer = response.body().string();
+                responseFromServer = gson.fromJson(dataFromServer, ResponseFromServer.class);
+
+                //Log.d("message", dataFromServer);
+
+                if(responseFromServer.getStatus() == 0){
+                    Looper.prepare();
+                    Toast.makeText(FightImgActivity.this, "什么都没找到", Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+                more = responseFromServer.getMore();
+
+                imageInfoList.clear();
+                imageInfoList.addAll(responseFromServer.getData());
+
+                //Log.d("imageInfoList", imageInfoList.get(0).getImage_url());
+
+                FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
             }
         });
     }

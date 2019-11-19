@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\appKeystore\\myappkey.jks')
+            storePassword '123321'
+            keyPassword '123321'
+            keyAlias = 'key0'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "xyz.mzc6838.qrscanner"
@@ -41,9 +49,9 @@ dependencies {
     implementation files('libs/JavaRoot.jar')
     implementation files('libs/ocr-sdk.jar')
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation("com.squareup.okhttp3:okhttp:3.14.1")
-    implementation ("com.android.support:recyclerview-v7:27.0.2")
+    implementation 'com.squareup.okhttp3:okhttp:3.14.1'
+    implementation 'com.android.support:recyclerview-v7:27.0.2'
     compile 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
-
+    implementation files('libs/open_sdk_r6199_lite.jar')
 }

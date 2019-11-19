@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/shareTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:hint="标题"/>
+
+    <EditText
+        android:id="@+id/shareSummary"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:hint="内容摘要"/>
+    <EditText
+        android:id="@+id/shareLink"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:hint="点击后跳转链接"/>
+    <EditText
+        android:id="@+id/shareImg"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+
+        android:hint="缩略图链接"/>
+    <EditText
+        android:id="@+id/shareAppName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:hint="应用名称"/>
+
+
+<Button
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:id="@+id/shareButton"
+    android:text="分享到qq"
+    />
+
+</LinearLayout>

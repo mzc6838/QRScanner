@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_APN_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -31,15 +34,37 @@
         <activity android:name="com.google.zxing.client.android.CaptureActivity">
 
         </activity>
-        <activity android:name=".activity.FightImgActivity"
-            android:parentActivityName=".activity.MainActivity">
+        <activity
+            android:name=".activity.FightImgActivity"
+            android:parentActivityName=".activity.MainActivity"></activity>
+        <activity
+            android:name=".activity.ScanActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name=".activity.GetTextActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name=".activity.CreateQRCodeActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent1109890979" />
+            </intent-filter>
         </activity>
-        <activity android:name=".activity.ScanActivity"
-            android:parentActivityName=".activity.MainActivity" />
-        <activity android:name=".activity.GetTextActivity"
-            android:parentActivityName=".activity.MainActivity" />
-        <activity android:name=".activity.CreateQRCodeActivity"
-            android:parentActivityName=".activity.MainActivity"/>
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="behind"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+
         <service android:name=".service.ColorPickService">
 
         </service>

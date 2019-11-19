@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/share"
+        android:title="分享该QRScanner"
+        android:icon="@drawable/ic_share"
+        app:showAsAction="ifRoom"/>
+
+<!--    <item-->
+<!--        android:id="@+id/changeTheme"-->
+<!--        android:title="切换显示模式" />-->
+</menu>

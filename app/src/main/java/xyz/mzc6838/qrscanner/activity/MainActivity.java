@@ -1,6 +1,7 @@
 package xyz.mzc6838.qrscanner.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,35 +15,39 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.SurfaceView;
-import android.view.View;
+import android.util.Log;
+import android.view.Menu;
 import android.widget.Button;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+
+import com.tencent.connect.share.QQShare;
+import com.tencent.tauth.IUiListener;
+import com.tencent.tauth.Tencent;
+import com.tencent.tauth.UiError;
 
 import xyz.mzc6838.qrscanner.R;
 import xyz.mzc6838.qrscanner.service.ColorPickService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     Button scan;
     Button getWord;
     Button fightImg;
     Button createQRCode;
     Button colorPicker;
+    Toolbar mainToolbar;
 
     MediaProjectionManager mMediaProjectionManager;
-    //static MediaProjection mMediaProjection;
-
-    SurfaceView mSurfaceView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         init();
     }
@@ -53,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
         fightImg = findViewById(R.id.fightImgButton);
         createQRCode = findViewById(R.id.createQRCode);
         colorPicker = findViewById(R.id.colorPickerButton);
-
-        //mSurfaceView = findViewById(R.id.mSurface);
+        mainToolbar = findViewById(R.id.mainToolbar);
 
         scan.setOnClickListener((v)->{
             if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
@@ -64,11 +68,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         getWord.setOnClickListener((v)->{
 
             Intent innerIntent = new Intent(MainActivity.this,GetTextActivity.class);
             startActivity(innerIntent);
         });
+
         fightImg.setOnClickListener((v)->{
 
                 //Toast.makeText(MainActivity.this, "斗图功能已停用！", Toast.LENGTH_SHORT).show();
@@ -124,10 +130,54 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.notify(255, notification);
 
             mMediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
-            startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), 5);
+            if(mMediaProjectionManager != null){
+                startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), 5);
+            }
+
+        });
+
+        mainToolbar.inflateMenu(R.menu.toolbar_manu);
+        mainToolbar.setOnMenuItemClickListener((item)->{
+            switch (item.getItemId()){
+                case(R.id.share):
+                    generateQQShare();
+                break;
+//                case (R.id.changeTheme):
+//                    //TODO 切换夜间模式
+//                    break;
+                default:
+                    break;
+            }
+            return false;
         });
 
 
+    }
+
+    void generateQQShare(){
+        Tencent t = Tencent.createInstance("1109890979", this);
+        final Bundle bundle = new Bundle();
+        bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
+        bundle.putString(QQShare.SHARE_TO_QQ_TITLE, "QRScanner");
+        bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, "自用app，实现二维码扫描、图片文字提取、表情包搜索功能");
+        bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, "https://github.com/mzc6838/QRScanner");
+        bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, "QRScanner_");
+        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, "http://toothless.mzc6838.xyz/blog/wp-content/uploads/2019/10/3.jpg");
+        t.shareToQQ(this, bundle, new IUiListener() {
+            @Override
+            public void onComplete(Object o) {
+            }
+
+            @Override
+            public void onError(UiError uiError) {
+                Log.d("onError:", uiError.errorMessage);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
     }
 
     @Override
@@ -159,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             }
+            default:
         }
     }
 
@@ -174,5 +225,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_manu, menu);
+        return true;
     }
 }

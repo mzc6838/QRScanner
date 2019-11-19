@@ -7,49 +7,59 @@
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/mainToolbar"
+        style="@style/Theme.AppCompat.Light.DarkActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimary"
+        app:title="QRScanner"
+        app:titleTextColor="#fff" />
+
     <Button
         android:id="@+id/scan"
-        android:text="识别二维码/条形码内容"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp" />
+        android:layout_marginEnd="5dp"
+        android:text="识别二维码/条形码内容" />
 
     <Button
         android:id="@+id/createQRCode"
-        android:text="生成二维码"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp" />
+        android:layout_marginEnd="5dp"
+        android:text="生成二维码" />
 
     <Button
         android:id="@+id/fightImgButton"
-        android:text="斗图"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp" />
+        android:layout_marginEnd="5dp"
+        android:text="斗图" />
 
     <Button
-    android:id="@+id/getWord"
-    android:layout_width="match_parent"
-    android:layout_height="54dp"
-    android:text="识别图中文字"
-    android:layout_marginStart="5dp"
-    android:layout_marginTop="5dp"
-    android:layout_marginEnd="5dp" />
+        android:id="@+id/getWord"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:text="识别图中文字" />
 
     <Button
         android:id="@+id/colorPickerButton"
         android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:text="屏幕取色器"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp" />
+        android:layout_marginEnd="5dp"
+        android:text="屏幕取色器" />
 
 </LinearLayout>
