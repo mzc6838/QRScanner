@@ -75,7 +75,7 @@ public class ImageUtil {
      * @param bitMatrix BitMatrix
      * @return bitmap Bitmap
      */
-    public static Bitmap bitmatrixToBitmap(BitMatrix bitMatrix){
+    public static Bitmap bitMatrixToBitmap(BitMatrix bitMatrix){
         int height = bitMatrix.getHeight();
         int width = bitMatrix.getWidth();
 

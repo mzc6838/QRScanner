@@ -47,6 +47,9 @@
             android:name=".activity.CreateQRCodeActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity
+            android:name=".activity.ConvertWithBase64"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"
             android:noHistory="true">

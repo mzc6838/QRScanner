@@ -68,7 +68,7 @@ public class CreateQRCodeActivity extends AppCompatActivity {
                 Toast.makeText(this, "请输入要转换的文本", Toast.LENGTH_SHORT).show();
             }else {
 
-                bitmap = ImageUtil.bitmatrixToBitmap(createQRCodeByString(contents));
+                bitmap = ImageUtil.bitMatrixToBitmap(createQRCodeByString(contents));
 
                 try{
                     Glide.with(this).load(bitmap).into(QRCode);

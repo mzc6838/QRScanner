@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -20,9 +21,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.tencent.connect.share.QQShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
@@ -33,14 +36,18 @@ import xyz.mzc6838.qrscanner.service.ColorPickService;
 
 public class MainActivity extends Activity {
 
-    Button scan;
-    Button getWord;
-    Button fightImg;
-    Button createQRCode;
-    Button colorPicker;
+    Button  scan,
+            getWord,
+            fightImg,
+            createQRCode,
+            colorPicker,
+            convertWithBase64;
+
     Toolbar mainToolbar;
 
     MediaProjectionManager mMediaProjectionManager;
+
+    ImageView waterMask;
 
 
     @Override
@@ -58,7 +65,13 @@ public class MainActivity extends Activity {
         fightImg = findViewById(R.id.fightImgButton);
         createQRCode = findViewById(R.id.createQRCode);
         colorPicker = findViewById(R.id.colorPickerButton);
+        convertWithBase64 = findViewById(R.id.convertWithBase64);
         mainToolbar = findViewById(R.id.mainToolbar);
+
+        //AssetManager assetManager = getAssets();
+        waterMask = findViewById(R.id.waterMask);
+        Glide.with(this).load("file:///android_asset/water.png").into(waterMask);
+
 
         scan.setOnClickListener((v)->{
             if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
@@ -71,8 +84,8 @@ public class MainActivity extends Activity {
 
         getWord.setOnClickListener((v)->{
 
-            Intent innerIntent = new Intent(MainActivity.this,GetTextActivity.class);
-            startActivity(innerIntent);
+            Intent intent = new Intent(MainActivity.this,GetTextActivity.class);
+            startActivity(intent);
         });
 
         fightImg.setOnClickListener((v)->{
@@ -135,6 +148,13 @@ public class MainActivity extends Activity {
             }
 
         });
+
+        convertWithBase64.setOnClickListener((v)->{
+            Intent intent = new Intent(MainActivity.this, ConvertWithBase64.class);
+            this.startActivity(intent);
+        });
+
+        waterMask.setOnClickListener((v)->Toast.makeText(this, "嗷！", Toast.LENGTH_SHORT).show());
 
         mainToolbar.inflateMenu(R.menu.toolbar_manu);
         mainToolbar.setOnMenuItemClickListener((item)->{
