@@ -25,26 +25,35 @@
             android:layout_width="135dp"
             android:layout_height="wrap_content"
             android:text="选择图片"
-            android:textSize="24sp"
+            android:textSize="16sp"
             android:id="@+id/selectImageToBase64_Button"/>
         <Button
             android:layout_width="135dp"
             android:layout_height="wrap_content"
-            android:text="转换"
-            android:textSize="24sp"
-            android:id="@+id/convertToBase64_Button"/>
+            android:text="复制"
+            android:textSize="16sp"
+            android:id="@+id/copyTheResult_Button"/>
 
     </LinearLayout>
 
-    <EditText
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="top"
         android:layout_margin="5dp"
-        android:inputType="textMultiLine"
-        android:id="@+id/base64FromImage_EditText"
+        android:id="@+id/base64FromImage_TextView"
         android:background="@drawable/edit_base64_bg"
         android:hint="转换后的Base64编码将在这里显示"/>
+
+<!--    <EditText-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:gravity="top"-->
+<!--        android:layout_margin="5dp"-->
+<!--        android:id="@+id/base64FromImage_EditText"-->
+<!--        android:background="@drawable/edit_base64_bg"-->
+<!--        android:hint="转换后的Base64编码将在这里显示"/>-->
 
 </LinearLayout>
