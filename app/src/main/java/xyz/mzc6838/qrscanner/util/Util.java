@@ -6,8 +6,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.Base64;
+import android.util.Log;
 
 import java.util.Random;
+
+import static android.support.constraint.Constraints.TAG;
 
 public class Util {
 
@@ -173,6 +177,62 @@ public class Util {
             canvas.drawLine(i * pixInterval, 0, i * pixInterval, bitmap.getHeight(), paint);
         }
         return copy;
+    }
+
+    /**
+     * 从完整的Base64图片编码中获取Base64编码
+     * @param base64Img 图片完整Base64编码
+     * @return 获取到的Base64编码与图片信息
+     *         [0] 图片格式
+     *         [1] Base64编码
+     */
+    public static String[] getBase64FromBase64Img(String base64Img){
+        String[] result = {"", ""};
+        /*
+         * 一个Base64格式应该如下：
+         *      data:image/[图片原格式扩展名];base64,[Base64编码字符串]
+         */
+
+        base64Img = base64Img.substring(11);
+
+       // Log.d(TAG, "getBase64FromBase64Img: " + base64Img);
+        String t = "";
+        while(true){
+            if(base64Img.charAt(0) == ';'){
+                break;
+            }else{
+                t += base64Img.charAt(0);
+                base64Img = base64Img.substring(1);
+            }
+        }
+        result[0] = t;
+        while(true){
+            if(base64Img.charAt(0) == ','){
+                base64Img = base64Img.substring(1);
+                break;
+            }else{
+                base64Img = base64Img.substring(1);
+            }
+        }
+        result[1] = base64Img;
+
+        return result;
+    }
+
+    /**
+     * 将传入的String字符串转换为byte型数组
+     * @param in 输入的String
+     * @return byte[] 转换出的byte数组
+     *         null   输入的String不合法
+     */
+    public static byte[] decodeBase64FromString(String in){
+        byte[] convert;
+        try{
+            convert = Base64.decode(in, Base64.DEFAULT);
+        }catch (Exception e){
+            return null;
+        }
+        return convert;
     }
 
 

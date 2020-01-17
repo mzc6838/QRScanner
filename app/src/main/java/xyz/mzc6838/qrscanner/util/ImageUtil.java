@@ -2,6 +2,7 @@ package xyz.mzc6838.qrscanner.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.Base64;
@@ -38,8 +39,6 @@ public class ImageUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        Log.d("data", data.toString());
 
         String result = Base64.encodeToString(data, Base64.DEFAULT);
 
@@ -89,4 +88,21 @@ public class ImageUtil {
 
         return bitmap;
     }
+
+    /**
+     * 将byte数组转为Bitmap
+     * @param in 输入的byte数组
+     * @return Bitmap 获得的Bitmap
+     *         null   输入的byte不合法
+     */
+    public static Bitmap bytesToBitmap(byte[] in){
+        Bitmap bitmap;
+        try {
+            bitmap = BitmapFactory.decodeByteArray(in, 0, in.length);
+        }catch (Exception e){
+            return null;
+        }
+        return bitmap;
+    }
+
 }
