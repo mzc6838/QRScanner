@@ -83,46 +83,46 @@ public class FightImgActivity extends AppCompatActivity {
         //imageListRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         imageListRecyclerView.setAdapter(imageAdapter);
         imageListRecyclerView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY)-> {
-                if(!imageListRecyclerView.canScrollVertically(1)){
-                    if(more == 1){
+            if(!imageListRecyclerView.canScrollVertically(1)){
+                if(more == 1){
 
-                        page++;
+                    page++;
 
-                        String urlH = "http://img.mzc6838.xyz:8000/search?";
-                        String urlKeyWord = "keyword=" + keyword;
-                        String urlPage = "&page=" + page;
-                        String url = urlH + urlKeyWord + urlPage;
+                    String urlH = "http://img.mzc6838.xyz:8000/search?";
+                    String urlKeyWord = "keyword=" + keyword;
+                    String urlPage = "&page=" + page;
+                    String url = urlH + urlKeyWord + urlPage;
 
-                        Request request = new Request.Builder()
-                                .url(url)
-                                .build();
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .build();
 
-                        Call call = okHttpClient.newCall(request);
-                        call.enqueue(new Callback() {
-                            @EverythingIsNonNull
-                            @Override
-                            public void onFailure(Call call, IOException e) {}
+                    Call call = okHttpClient.newCall(request);
+                    call.enqueue(new Callback() {
+                        @EverythingIsNonNull
+                        @Override
+                        public void onFailure(Call call, IOException e) {}
 
-                            @EverythingIsNonNull
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                Gson gson = new Gson();
-                                ResponseFromServer responseFromServer = gson.fromJson(response.body().string(), ResponseFromServer.class);
+                        @EverythingIsNonNull
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            Gson gson = new Gson();
+                            ResponseFromServer responseFromServer = gson.fromJson(response.body().string(), ResponseFromServer.class);
 
-                                more = responseFromServer.getMore();
+                            more = responseFromServer.getMore();
 
-                                imageInfoList.addAll(responseFromServer.getData());
+                            imageInfoList.addAll(responseFromServer.getData());
 
-                                FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
+                            FightImgActivity.this.runOnUiThread(()->imageAdapter.notifyDataSetChanged());
 
-                            }
-                        });
-                    }else {
-                        more = 0;
-                        Toast.makeText(this, "没有更多了", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }else {
+                    more = 0;
+                    Toast.makeText(this, "没有更多了", Toast.LENGTH_LONG).show();
 
-                    }
                 }
+            }
         });
 
         imageAdapter.setOnItemLongClickListener(new ImageAdapter.OnItemLongClickListener() {
@@ -149,7 +149,7 @@ public class FightImgActivity extends AppCompatActivity {
                         byte buff[] = new byte[2048];
                         int len = 0;
                         FileOutputStream fos = null;
-                        String savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "YYDoutu";
+                        String savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "YYDoutu/doutu";
                         File file = new File(savePath);
                         File file1 = new File(savePath, getNameFromUrl(url));
                         if(!file.exists()){
@@ -265,20 +265,15 @@ public class FightImgActivity extends AppCompatActivity {
             }
         });
 
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                searchFromServer();
-                if(inputMethodManager != null)
-                    inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-
-            }
+        search.setOnClickListener((v)-> {
+            searchFromServer();
+            if(inputMethodManager != null)
+                inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         });
 
         editText.setOnEditorActionListener((textView, actionId, keyEvent)->{
 
-            if(actionId == EditorInfo.IME_ACTION_SEND
+            if(        actionId == EditorInfo.IME_ACTION_SEND
                     || actionId == EditorInfo.IME_ACTION_DONE
                     || keyEvent != null
                     && keyEvent.KEYCODE_ENTER == keyEvent.getKeyCode()

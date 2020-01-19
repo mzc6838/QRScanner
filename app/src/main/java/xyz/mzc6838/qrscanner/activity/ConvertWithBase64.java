@@ -197,7 +197,7 @@ public class ConvertWithBase64 extends AppCompatActivity {
 
         Bitmap bitmap;
 
-        String externName;
+        String extension;
 
         @Nullable
         @Override
@@ -231,7 +231,7 @@ public class ConvertWithBase64 extends AppCompatActivity {
                      */
                     String[] base64Code = Util.getBase64FromBase64Img(input);
                     byte[] convert;
-                    externName = base64Code[0];
+                    extension = base64Code[0];
 
                     convert = Util.decodeBase64FromString(base64Code[1]);
                     if(convert != null){

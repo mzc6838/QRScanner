@@ -89,7 +89,14 @@ public class CreateQRCodeActivity extends AppCompatActivity {
 
             String fileName = Util.getRandomString(8) + ".png";
 
-            String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "YYDoutu/" + fileName;
+            String savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "YYDoutu/QRCodeImage/";
+
+            String path = savePath + fileName;
+
+            File savePathFile = new File(savePath);
+            if(!savePathFile.exists()){
+                savePathFile.mkdirs();
+            }
 
             try{
                 OutputStream os = new FileOutputStream(path);
