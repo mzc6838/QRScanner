@@ -41,7 +41,8 @@ public class MainActivity extends Activity {
             fightImg,
             createQRCode,
             colorPicker,
-            convertWithBase64;
+            convertWithBase64,
+            transfer;
 
     Toolbar mainToolbar;
 
@@ -66,6 +67,8 @@ public class MainActivity extends Activity {
         createQRCode = findViewById(R.id.createQRCode);
         colorPicker = findViewById(R.id.colorPickerButton);
         convertWithBase64 = findViewById(R.id.convertWithBase64);
+        transfer = findViewById(R.id.transfer);
+
         mainToolbar = findViewById(R.id.mainToolbar);
 
         //AssetManager assetManager = getAssets();
@@ -151,6 +154,11 @@ public class MainActivity extends Activity {
 
         convertWithBase64.setOnClickListener((v)->{
             Intent intent = new Intent(MainActivity.this, ConvertWithBase64.class);
+            this.startActivity(intent);
+        });
+
+        transfer.setOnClickListener((v)->{
+            Intent intent = new Intent(MainActivity.this, TransferActivity.class);
             this.startActivity(intent);
         });
 

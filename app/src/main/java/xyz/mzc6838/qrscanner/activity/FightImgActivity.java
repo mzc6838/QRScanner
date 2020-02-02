@@ -88,7 +88,7 @@ public class FightImgActivity extends AppCompatActivity {
 
                     page++;
 
-                    String urlH = "http://img.mzc6838.xyz:8000/search?";
+                    String urlH = "http://server.mzc6838.xyz:8000/search?";
                     String urlKeyWord = "keyword=" + keyword;
                     String urlPage = "&page=" + page;
                     String url = urlH + urlKeyWord + urlPage;
@@ -275,11 +275,8 @@ public class FightImgActivity extends AppCompatActivity {
 
             if(        actionId == EditorInfo.IME_ACTION_SEND
                     || actionId == EditorInfo.IME_ACTION_DONE
-                    || keyEvent != null
                     && keyEvent.KEYCODE_ENTER == keyEvent.getKeyCode()
                     && keyEvent.ACTION_DOWN == keyEvent.getAction()){
-
-                Log.d("editEdit", "click ");
 
                 if(!editText.getText().toString().equals("")){
                     if(inputMethodManager != null)
@@ -300,7 +297,7 @@ public class FightImgActivity extends AppCompatActivity {
         keyword = "" + editText.getText();
         imageListRecyclerView.scrollToPosition(0);
 
-        String urlH = "http://img.mzc6838.xyz:8000/search?";
+        String urlH = "http://server.mzc6838.xyz:8000/search?";
         String urlKeyWord = "keyword=" + keyword;
         String urlPage = "&page=" + page;
         String url = urlH + urlKeyWord + urlPage;
