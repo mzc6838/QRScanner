@@ -63,14 +63,14 @@ public class ConvertWithBase64 extends AppCompatActivity {
         mainTabLayout = findViewById(R.id.mainTabLayout);
         mainVP = findViewById(R.id.mainVP);
 
-        mainTabLayout.addTab(mainTabLayout.newTab().setText("Base64转图片"));
         mainTabLayout.addTab(mainTabLayout.newTab().setText("图片转Base64"));
+        mainTabLayout.addTab(mainTabLayout.newTab().setText("Base64转图片"));
 
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new ImageToBase64Class());
         fragments.add(new Base64ToImageClass());
 
-        String[] titles = {"Base64转图片", "图片转Base64"};
+        String[] titles = {"图片转Base64", "Base64转图片"};
 
         innerFragmentAdapter = new InnerFragmentAdapter(getSupportFragmentManager());
         innerFragmentAdapter.addFragments(titles, fragments);
